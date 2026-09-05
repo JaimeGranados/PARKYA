@@ -7,8 +7,8 @@ Proyecto integrador del curso Base de Datos I. Modelo de datos para una empresa 
 | Nombre | Documento |
 |---|---|
 | Jaime Granados | 1067605475 |
-| Camilo Badillo | 1067605475 |
-| Moisés Carrillo | — |
+| Camilo Badillo | - |
+| Moisés Carrillo | 1122809328 |
 
 > Nota: revisar el documento de Camilo, quedó igual al de Jaime — probablemente un error de digitación.
 
