@@ -26,6 +26,7 @@ PARKYA/
     requisitos-y-supuestos.md
     correcciones-entrega-1.md    qué cambió del diseño y por qué
     esquema-relacional.md        esquema de la Entrega 2 (base de las migraciones)
+    normalizacion.md             auditoría de normalización (DF, 3FN/BCNF, excepciones)
     diccionario-de-datos.md
   diagramas/
     eer-chen-parkya-entrega2.png diagrama EER vigente

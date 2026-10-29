@@ -20,3 +20,13 @@
 - ¿La tarifa depende de la hora del día? **Supuesto:** por ahora no, solo depende de sede y tipo de vehículo.
 - ¿Puede reportarse una incidencia sin una sesión activa? **Supuesto:** sí, por eso la relación SESION–INCIDENCIA es opcional.
 - ¿Qué pasa si se elimina un cliente? **Supuesto:** sus vehículos y sesiones no se eliminan; solo se desvincula el vehículo del cliente.
+
+### Supuestos añadidos en la Entrega 2
+
+Surgieron durante la auditoría de normalización ([`normalizacion.md`](normalizacion.md)).
+
+- ¿El nombre del plan fija su duración ("Mensual" = 30 días siempre)? **Supuesto:** no. El nombre es una etiqueta comercial y cada plan define su duración (puede haber un "Mensual" de motos por 31 días en promoción). Por eso no existe la dependencia `nombre → duracion_dias`.
+- ¿El número del espacio indica el piso (la "A" de `A-15` = piso 1)? **Supuesto:** no. El número es una etiqueta que cada sede asigna a su manera, y el piso se registra aparte.
+- ¿Dos clientes pueden compartir correo? **Supuesto:** sí (por ejemplo, una familia). Por eso `correo` no es único.
+- ¿En una misma sesión pueden reportar incidencias empleados distintos? **Supuesto:** sí. Por eso la sesión no determina al empleado que reporta.
+- Si cambia la duración de un plan, ¿cambian las suscripciones ya vendidas? **Supuesto:** no. `fecha_fin` guarda lo que se vendió (excepción E2 de la normalización).
