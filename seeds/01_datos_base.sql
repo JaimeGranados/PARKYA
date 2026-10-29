@@ -98,6 +98,67 @@ FROM (VALUES
 JOIN tipo_vehiculo t ON t.nombre = v.tipo;
 
 
+-- ---------- Clientes (28) ----------
+-- 80000001-80000012: suscriptores. 90000001-90000016: ocasionales.
+INSERT INTO cliente (nombre, documento, telefono, correo, tipo_cliente) VALUES
+ ('Andrea Ospina',     '80000001', '3101000001', 'andrea.ospina@ejemplo.com',   'suscriptor'),
+ ('Felipe Rendón',     '80000002', '3101000002', 'felipe.rendon@ejemplo.com',   'suscriptor'),
+ ('Marcela Toro',      '80000003', '3101000003', 'marcela.toro@ejemplo.com',    'suscriptor'),
+ ('Julián Escobar',    '80000004', '3101000004', 'julian.escobar@ejemplo.com',  'suscriptor'),
+ ('Natalia Vélez',     '80000005', '3101000005', 'natalia.velez@ejemplo.com',   'suscriptor'),
+ ('Sergio Londoño',    '80000006', '3101000006', 'sergio.londono@ejemplo.com',  'suscriptor'),
+ ('Paola Arango',      '80000007', '3101000007', 'paola.arango@ejemplo.com',    'suscriptor'),
+ ('Iván Zapata',       '80000008', '3101000008', 'ivan.zapata@ejemplo.com',     'suscriptor'),
+ ('Lucía Cardona',     '80000009', '3101000009', 'lucia.cardona@ejemplo.com',   'suscriptor'),
+ ('Mateo Giraldo',     '80000010', '3101000010', 'mateo.giraldo@ejemplo.com',   'suscriptor'),
+ ('Daniela Restrepo',  '80000011', '3101000011', 'daniela.restrepo@ejemplo.com','suscriptor'),
+ ('Esteban Mejía',     '80000012', '3101000012', 'esteban.mejia@ejemplo.com',   'suscriptor'),
+ ('Gloria Henao',      '90000001', '3202000001', 'gloria.henao@ejemplo.com',    'ocasional'),
+ ('Camila Duque',      '90000002', '3202000002', 'camila.duque@ejemplo.com',    'ocasional'),
+ ('Diego Montoya',     '90000003', '3202000003', 'diego.montoya@ejemplo.com',   'ocasional'),
+ ('Valentina Ríos',    '90000004', '3202000004', 'valentina.rios@ejemplo.com',  'ocasional'),
+ ('Santiago Peña',     '90000005', '3202000005', 'santiago.pena@ejemplo.com',   'ocasional'),
+ ('Juliana Salazar',   '90000006', '3202000006', 'juliana.salazar@ejemplo.com', 'ocasional'),
+ ('Andrés Cuartas',    '90000007', '3202000007', 'andres.cuartas@ejemplo.com',  'ocasional'),
+ ('Manuela Botero',    '90000008', '3202000008', 'manuela.botero@ejemplo.com',  'ocasional'),
+ ('Tomás Uribe',       '90000009', '3202000009', 'tomas.uribe@ejemplo.com',     'ocasional'),
+ ('Isabela Gómez',     '90000010', '3202000010', 'isabela.gomez@ejemplo.com',   'ocasional'),
+ ('Nicolás Franco',    '90000011', '3202000011', 'nicolas.franco@ejemplo.com',  'ocasional'),
+ ('Sara Jaramillo',    '90000012', '3202000012', 'sara.jaramillo@ejemplo.com',  'ocasional'),
+ ('Camilo Osorio',     '90000013', '3202000013', 'camilo.osorio@ejemplo.com',   'ocasional'),
+ ('Luisa Marín',       '90000014', '3202000014', 'luisa.marin@ejemplo.com',     'ocasional'),
+ ('Daniel Acevedo',    '90000015', '3202000015', 'daniel.acevedo@ejemplo.com',  'ocasional'),
+ ('Karen Bedoya',      '90000016', NULL,         NULL,                          'ocasional');
+
+INSERT INTO cliente_suscriptor (id_cliente, fecha_afiliacion)
+SELECT id_cliente, CURRENT_DATE - 120
+FROM cliente WHERE tipo_cliente = 'suscriptor';
+
+INSERT INTO cliente_ocasional (id_cliente)
+SELECT id_cliente FROM cliente WHERE tipo_cliente = 'ocasional';
+
+-- ---------- Vehiculos de suscriptores (14) ----------
+INSERT INTO vehiculo (placa, id_tipo_vehiculo, id_cliente)
+SELECT v.placa, t.id_tipo_vehiculo, c.id_cliente
+FROM (VALUES
+ ('ABC123','carro',     '80000001'),
+ ('NPQ12R','moto',      '80000001'),
+ ('BCD234','carro',     '80000002'),
+ ('PQR23S','moto',      '80000002'),
+ ('CDE34F','moto',      '80000003'),
+ ('DEF456','camioneta', '80000004'),
+ ('EFG567','carro',     '80000005'),
+ ('FGH45J','moto',      '80000006'),
+ ('GHJ678','carro',     '80000007'),
+ ('HJK789','carro',     '80000008'),
+ ('JKL56M','moto',      '80000009'),
+ ('KLM890','camioneta', '80000010'),
+ ('LMN901','carro',     '80000011'),
+ ('MNP012','carro',     '80000012')
+) AS v(placa, tipo, doc)
+JOIN tipo_vehiculo t ON t.nombre = v.tipo
+JOIN cliente c ON c.documento = v.doc;
+
 -- ---------- Suscripciones (14) ----------
 -- Fechas relativas a hoy. ini = dias desde hoy hasta el inicio; canc = dia de cancelacion (NULL = no cancelada).
 -- fecha_fin = inicio + duracion del plan.
@@ -131,6 +192,39 @@ JOIN cliente c ON c.documento = v.documento
 JOIN tipo_vehiculo t ON t.nombre = v.tipo
 JOIN plan_suscripcion p ON p.id_tipo_vehiculo = t.id_tipo_vehiculo AND p.nombre = v.plan;
 
+
+-- ---------- Vehiculos de ocasionales y visitantes (23) ----------
+-- El tipo coincide con el tipo del espacio donde parquea cada placa.
+-- TMP0001 y TMP0002 son temporales, sin cliente.
+INSERT INTO vehiculo (placa, id_tipo_vehiculo, id_cliente)
+SELECT v.placa, t.id_tipo_vehiculo, c.id_cliente
+FROM (VALUES
+ ('QRS345','carro',     '90000001'),
+ ('GHK78L','moto',      '90000001'),
+ ('RST456','carro',     '90000002'),
+ ('HJL890','camioneta', '90000002'),
+ ('STU67V','moto',      '90000003'),
+ ('JKM901','carro',     '90000003'),
+ ('TUV567','carro',     '90000004'),
+ ('KLN012','carro',     '90000004'),
+ ('UVW678','camioneta', '90000005'),
+ ('LMP123','carro',     '90000005'),
+ ('VWX789','carro',     '90000006'),
+ ('WXY89Z','moto',      '90000007'),
+ ('XYZ890','carro',     '90000008'),
+ ('YZA901','carro',     '90000009'),
+ ('ZAB12C','moto',      '90000010'),
+ ('ABD012','carro',     '90000011'),
+ ('BCE123','camioneta', '90000012'),
+ ('CDF234','carro',     '90000013'),
+ ('DEG45H','moto',      '90000014'),
+ ('EFH567','carro',     '90000015'),
+ ('FGJ678','carro',     '90000016'),
+ ('TMP0001','carro',    NULL),
+ ('TMP0002','moto',     NULL)
+) AS v(placa, tipo, doc)
+JOIN tipo_vehiculo t ON t.nombre = v.tipo
+LEFT JOIN cliente c ON c.documento = v.doc;
 
 -- ---------- Sesiones cerradas (71) ----------
 -- Columnas: placa, sede, espacio, documento del empleado que cierra (NULL = cierre
