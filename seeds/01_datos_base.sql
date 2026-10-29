@@ -96,3 +96,37 @@ FROM (VALUES
  ('camioneta', 'Trimestral',90, 650000)
 ) AS v(tipo, nombre, dias, precio)
 JOIN tipo_vehiculo t ON t.nombre = v.tipo;
+
+
+-- ---------- Suscripciones (14) ----------
+-- Fechas relativas a hoy. ini = dias desde hoy hasta el inicio; canc = dia de cancelacion (NULL = no cancelada).
+-- fecha_fin = inicio + duracion del plan.
+-- Casos a proposito:
+--   * 10 activas hoy (sin cancelar, hoy entre inicio y fin)
+--   * 4 de ellas vencen en los proximos 7 dias (consulta 7): BCD234, CDE34F, DEF456, FGH45J
+--   * 2 canceladas (HJK789 y LMN901); LMN901 vencería en 4 dias pero esta cancelada, no debe salir en la consulta 7
+--   * 2 ya vencidas (GHJ678 y PQR23S)
+INSERT INTO suscripcion (id_cliente, placa, id_plan, fecha_inicio, fecha_fin, fecha_cancelacion)
+SELECT c.id_cliente, v.placa, p.id_plan,
+       CURRENT_DATE + v.ini,
+       CURRENT_DATE + v.ini + p.duracion_dias,
+       CURRENT_DATE + v.canc
+FROM (VALUES
+ ('80000001','ABC123','carro',    'Mensual',    -10, NULL),
+ ('80000002','BCD234','carro',    'Mensual',    -25, NULL),
+ ('80000003','CDE34F','moto',     'Trimestral', -88, NULL),
+ ('80000004','DEF456','camioneta','Mensual',    -27, NULL),
+ ('80000005','EFG567','carro',    'Trimestral', -40, NULL),
+ ('80000006','FGH45J','moto',     'Mensual',    -24, NULL),
+ ('80000007','GHJ678','carro',    'Mensual',    -45, NULL),
+ ('80000008','HJK789','carro',    'Mensual',    -20,  -5),
+ ('80000009','JKL56M','moto',     'Mensual',     -5, NULL),
+ ('80000010','KLM890','camioneta','Trimestral', -60, NULL),
+ ('80000011','LMN901','carro',    'Mensual',    -26,  -3),
+ ('80000012','MNP012','carro',    'Mensual',     -3, NULL),
+ ('80000001','NPQ12R','moto',     'Mensual',    -15, NULL),
+ ('80000002','PQR23S','moto',     'Mensual',    -90, NULL)
+) AS v(documento, placa, tipo, plan, ini, canc)
+JOIN cliente c ON c.documento = v.documento
+JOIN tipo_vehiculo t ON t.nombre = v.tipo
+JOIN plan_suscripcion p ON p.id_tipo_vehiculo = t.id_tipo_vehiculo AND p.nombre = v.plan;
