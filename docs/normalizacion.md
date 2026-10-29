@@ -127,7 +127,7 @@ Todas las tablas cumplen 1FN:
 
 - **Claves candidatas:**
   - {id_sesion}
-  - {placa, hora_entrada}: un vehículo no puede entrar dos veces en el mismo instante.
+  - {placa, hora_entrada}: un vehículo no puede entrar dos veces en el mismo instante. Declarada con `UNIQUE`.
   - {id_sede, numero_espacio, hora_entrada}: dos vehículos no pueden ocupar el mismo espacio desde el mismo instante.
 - **DF:**
   - `id_sesion → placa, id_sede, numero_espacio, id_empleado_cierre, hora_entrada, hora_salida, valor_cobrado`

@@ -71,7 +71,7 @@ _(Pendiente: copiar aquí las observaciones del profesor sobre la Entrega 1 y en
 | PLAN_SUSCRIPCION | `precio > 0`, `duracion_dias > 0`, `UNIQUE (id_tipo_vehiculo, nombre)` |
 | SUSCRIPCION | `fecha_fin > fecha_inicio`; cancelación entre inicio y fin |
 | TARIFA | `valor_hora > 0`; `vigencia_hasta > vigencia_desde` |
-| SESION | `hora_salida > hora_entrada`; `valor_cobrado >= 0`; una sola sesión abierta por vehículo y por espacio (índices únicos parciales) |
+| SESION | `hora_salida > hora_entrada`; `valor_cobrado >= 0`; `UNIQUE (placa, hora_entrada)`; una sola sesión abierta por vehículo y por espacio (índices únicos parciales) |
 | PAGO | `monto > 0`; `metodo_pago` ∈ {efectivo, tarjeta, app} |
 | INCIDENCIA | `tipo_incidencia` ∈ {dano, mal_parqueo, fraude, otro} |
 
