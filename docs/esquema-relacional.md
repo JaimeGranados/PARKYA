@@ -167,6 +167,7 @@ PK compuesta: `(id_sede, numero_espacio)`.
 | valor_cobrado | NUMERIC(10,2) | Sí | `CHECK (valor_cobrado >= 0)`; 0 si la cubre una suscripción |
 
 - FK `(id_sede, numero_espacio)` → `espacio` **ON DELETE RESTRICT**.
+- `UNIQUE (placa, hora_entrada)`: un vehículo no entra dos veces en el mismo instante. Es clave candidata (ver `normalizacion.md`).
 - `CHECK (hora_salida IS NOT NULL OR valor_cobrado IS NULL)`: no se cobra una sesión abierta.
 - Una sola sesión abierta por vehículo: `CREATE UNIQUE INDEX ... ON sesion (placa) WHERE hora_salida IS NULL`.
 - Una sola sesión abierta por espacio: `CREATE UNIQUE INDEX ... ON sesion (id_sede, numero_espacio) WHERE hora_salida IS NULL`.
@@ -210,7 +211,8 @@ No se implementan en esta entrega; se dejan anotadas:
 
 PostgreSQL **no** crea índices automáticos en las FK (solo en PK y UQ). Propuesta:
 
-- `sesion (placa)`, `sesion (id_sede, numero_espacio)` (cubiertos en parte por los índices únicos parciales, pero esos solo incluyen sesiones abiertas)
+- `sesion (id_sede, numero_espacio)` (el índice único parcial solo incluye las sesiones abiertas)
+- `sesion (placa)` **no** hace falta: el `UNIQUE (placa, hora_entrada)` ya crea un índice que empieza por `placa`
 - `pago (id_sesion)`, `pago (id_suscripcion)`
 - `incidencia (id_sesion)`, `incidencia (id_empleado)`
 - `suscripcion (placa)`, `suscripcion (id_cliente)`
