@@ -91,5 +91,5 @@ Se documentan aquí y se justifican en la auditoría de normalización:
 
 ## Pendiente
 
-- [ ] Actualizar `diagramas/` (EER) con C1, C2, C3, C4, C5 y C6.
+- [x] Actualizar el diagrama EER con C1–C6: `diagramas/eer-chen-parkya-entrega2.png` (los cambios están en naranja).
 - [ ] Agregar las observaciones del profesor cuando lleguen.
