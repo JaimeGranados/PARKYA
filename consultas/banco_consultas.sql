@@ -18,7 +18,10 @@
 -- rango de fechas (aqui, los ultimos 30 dias)?
 -- Requisito: RF8 | Tecnica: join de 3+ tablas + GROUP BY
 -- Solo cuenta pagos de sesiones: un pago de suscripcion no tiene sede.
--- Verificacion: pendiente. Resultado: pendiente.
+-- Verificacion: 39 pagos de sesiones en los ultimos 30 dias, suma 417400.00.
+--   Se comprobo con una suma directa sobre pago, sin unir sede ni vehiculo:
+--   dio 39 pagos y 417400.00, igual que la suma de las 9 filas (3 sedes x 3 tipos).
+--   -> se esperan 9 filas. Resultado: 9 filas, 39 pagos, 417400.00. OK
 -- ============================================================
 SELECT s.nombre  AS sede,
        tv.nombre AS tipo_vehiculo,
@@ -46,7 +49,10 @@ ORDER BY s.nombre, tv.nombre;
 -- repetiria la fila de la sesion y duplicaria el resto de columnas.
 -- LEFT JOIN al empleado: una sesion abierta o con cierre automatico
 -- no tiene empleado de cierre.
--- Verificacion: pendiente. Resultado: pendiente.
+-- Verificacion: Andrea Ospina es la clienta con mas sesiones: 8 (6 de ABC123 y
+--   2 de NPQ12R). Solo la sesion mas antigua se cobro (13500.00 = 3 horas a 4500);
+--   las demas las cubre la suscripcion y no tienen pago, suman 0.
+--   -> se esperan 8 filas y pagado total 13500.00. Resultado: 8 filas, 13500.00. OK
 -- ============================================================
 WITH cliente_elegido AS (
     SELECT v.id_cliente
@@ -84,7 +90,9 @@ ORDER BY ses.placa, ses.hora_entrada;
 -- ============================================================
 -- Consulta 3. Que empleados no han reportado ninguna incidencia?
 -- Requisito: RF6 | Tecnica: LEFT JOIN "los que no tienen" (WHERE ... IS NULL)
--- Verificacion: pendiente. Resultado: pendiente.
+-- Verificacion: hay 9 empleados y 6 aparecen en incidencia (count DISTINCT = 6)
+--   -> se esperan 3 filas: Sofia Quintero (Centro), Hernan Beltran (Norte)
+--   y Patricia Leal (Sur). Resultado: 3 filas, esas tres personas. OK
 -- ============================================================
 SELECT e.nombre, e.cargo, s.nombre AS sede
 FROM empleado e
@@ -101,7 +109,12 @@ ORDER BY s.nombre, e.nombre;
 -- Activa = no cancelada y hoy entre fecha_inicio y fecha_fin (C5).
 -- Solo se une cliente, vehiculo y sesion: no hay pagos ni incidencias
 -- en el join, asi que el conteo de sesiones no se infla.
--- Verificacion: pendiente. Resultado: pendiente.
+-- Verificacion: 8 clientes tienen mas de 3 sesiones en los ultimos 30 dias
+--   (Andrea Ospina 8, Gloria Henao 7, Camila Duque 6, Felipe Rendon 5, Ivan Zapata 5,
+--   Paola Arango 5, Diego Montoya 4, Julian Escobar 4). Andrea Ospina, Felipe Rendon
+--   y Julian Escobar tienen suscripcion activa (ABC123, BCD234, DEF456): se excluyen.
+--   -> se esperan 5 filas: Gloria Henao, Camila Duque, Ivan Zapata, Paola Arango
+--   y Diego Montoya. Resultado: 5 filas. OK
 -- ============================================================
 SELECT c.nombre,
        c.documento,
