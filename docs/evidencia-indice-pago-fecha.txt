@@ -1,0 +1,86 @@
+=== Tamaño de las tablas ===
+ tabla  | filas 
+--------+-------
+ pago   | 49985
+ sesion | 50014
+(2 filas)
+
+ANALYZE
+ANALYZE
+=== ANTES: sin índice sobre pago.fecha_pago ===
+BEGIN
+DROP INDEX
+                                                                   QUERY PLAN                                                                    
+-------------------------------------------------------------------------------------------------------------------------------------------------
+ GroupAggregate  (cost=2315.64..2317.26 rows=9 width=78) (actual time=13.416..13.513 rows=9.00 loops=1)
+   Group Key: (COALESCE(sd.nombre, 'Suscripciones'::character varying)), p.metodo_pago
+   Buffers: shared hit=786
+   ->  Sort  (cost=2315.64..2315.94 rows=121 width=43) (actual time=13.369..13.381 rows=139.00 loops=1)
+         Sort Key: (COALESCE(sd.nombre, 'Suscripciones'::character varying)), p.metodo_pago
+         Sort Method: quicksort  Memory: 31kB
+         Buffers: shared hit=786
+         ->  Nested Loop Left Join  (cost=0.29..2311.45 rows=121 width=43) (actual time=0.042..13.155 rows=139.00 loops=1)
+               Join Filter: (sd.id_sede = s.id_sede)
+               Rows Removed by Join Filter: 138
+               Buffers: shared hit=786
+               ->  Nested Loop Left Join  (cost=0.29..2305.87 rows=121 width=15) (actual time=0.030..13.074 rows=139.00 loops=1)
+                     Buffers: shared hit=785
+                     ->  Seq Scan on pago p  (cost=0.00..1492.66 rows=121 width=15) (actual time=0.017..12.480 rows=139.00 loops=1)
+                           Filter: ((fecha_pago < CURRENT_DATE) AND (fecha_pago >= (CURRENT_DATE - 1)))
+                           Rows Removed by Filter: 49846
+                           Buffers: shared hit=368
+                     ->  Index Scan using pk_sesion on sesion s  (cost=0.29..6.72 rows=1 width=8) (actual time=0.004..0.004 rows=1.00 loops=139)
+                           Index Cond: (id_sesion = p.id_sesion)
+                           Index Searches: 139
+                           Buffers: shared hit=417
+               ->  Materialize  (cost=0.00..1.04 rows=3 width=16) (actual time=0.000..0.000 rows=1.99 loops=139)
+                     Storage: Memory  Maximum Storage: 17kB
+                     Buffers: shared hit=1
+                     ->  Seq Scan on sede sd  (cost=0.00..1.03 rows=3 width=16) (actual time=0.006..0.007 rows=3.00 loops=1)
+                           Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=184
+ Planning Time: 6.949 ms
+ Execution Time: 13.568 ms
+(30 filas)
+
+ROLLBACK
+=== DESPUÉS: con ix_pago_fecha_pago ===
+                                                                        QUERY PLAN                                                                        
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+ GroupAggregate  (cost=1119.79..1121.49 rows=9 width=78) (actual time=0.758..0.841 rows=9.00 loops=1)
+   Group Key: (COALESCE(sd.nombre, 'Suscripciones'::character varying)), p.metodo_pago
+   Buffers: shared hit=545
+   ->  Sort  (cost=1119.79..1120.11 rows=127 width=43) (actual time=0.741..0.748 rows=139.00 loops=1)
+         Sort Key: (COALESCE(sd.nombre, 'Suscripciones'::character varying)), p.metodo_pago
+         Sort Method: quicksort  Memory: 31kB
+         Buffers: shared hit=545
+         ->  Nested Loop Left Join  (cost=5.89..1115.35 rows=127 width=43) (actual time=0.137..0.626 rows=139.00 loops=1)
+               Join Filter: (sd.id_sede = s.id_sede)
+               Rows Removed by Join Filter: 138
+               Buffers: shared hit=545
+               ->  Nested Loop Left Join  (cost=5.89..1109.54 rows=127 width=15) (actual time=0.114..0.540 rows=139.00 loops=1)
+                     Buffers: shared hit=544
+                     ->  Bitmap Heap Scan on pago p  (cost=5.60..266.49 rows=127 width=15) (actual time=0.104..0.204 rows=139.00 loops=1)
+                           Recheck Cond: ((fecha_pago >= (CURRENT_DATE - 1)) AND (fecha_pago < CURRENT_DATE))
+                           Heap Blocks: exact=121
+                           Buffers: shared hit=127
+                           ->  Bitmap Index Scan on ix_pago_fecha_pago  (cost=0.00..5.57 rows=127 width=0) (actual time=0.059..0.060 rows=139.00 loops=1)
+                                 Index Cond: ((fecha_pago >= (CURRENT_DATE - 1)) AND (fecha_pago < CURRENT_DATE))
+                                 Index Searches: 1
+                                 Buffers: shared hit=6
+                     ->  Index Scan using pk_sesion on sesion s  (cost=0.29..6.64 rows=1 width=8) (actual time=0.002..0.002 rows=1.00 loops=139)
+                           Index Cond: (id_sesion = p.id_sesion)
+                           Index Searches: 139
+                           Buffers: shared hit=417
+               ->  Materialize  (cost=0.00..1.04 rows=3 width=16) (actual time=0.000..0.000 rows=1.99 loops=139)
+                     Storage: Memory  Maximum Storage: 17kB
+                     Buffers: shared hit=1
+                     ->  Seq Scan on sede sd  (cost=0.00..1.03 rows=3 width=16) (actual time=0.013..0.014 rows=3.00 loops=1)
+                           Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=55
+ Planning Time: 3.408 ms
+ Execution Time: 0.931 ms
+(34 filas)
+

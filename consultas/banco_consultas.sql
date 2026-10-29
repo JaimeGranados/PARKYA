@@ -4,7 +4,8 @@
 -- Depende de: todas las migraciones y seeds/01_datos_base.sql.
 -- Uso: psql -d parkya -f consultas/banco_consultas.sql
 --
--- Los resultados esperados se calcularon a mano sobre 01_datos_base.sql.
+-- Los resultados esperados se calcularon a mano sobre 01_datos_base.sql (la consulta 1,
+-- que tambien suma pagos de 02_volumen.sql, con una suma directa sobre pago).
 -- Los seeds usan fechas relativas a hoy, asi que los resultados no cambian
 -- con el dia en que se ejecuten.
 -- ============================================================
@@ -18,10 +19,13 @@
 -- rango de fechas (aqui, los ultimos 30 dias)?
 -- Requisito: RF8 | Tecnica: join de 3+ tablas + GROUP BY
 -- Solo cuenta pagos de sesiones: un pago de suscripcion no tiene sede.
--- Verificacion: 39 pagos de sesiones en los ultimos 30 dias, suma 417400.00.
---   Se comprobo con una suma directa sobre pago, sin unir sede ni vehiculo:
---   dio 39 pagos y 417400.00, igual que la suma de las 9 filas (3 sedes x 3 tipos).
---   -> se esperan 9 filas. Resultado: 9 filas, 39 pagos, 417400.00. OK
+-- Verificacion: solo con 01_datos_base.sql son 39 pagos de sesiones en los ultimos
+--   30 dias, suma 417400.00. 02_volumen.sql agrega pagos de esos dias, asi que el
+--   total se comprueba con una suma directa sobre pago, sin unir sede ni vehiculo,
+--   y debe ser igual a la suma de las 9 filas (3 sedes x 3 tipos).
+--   -> se esperan 9 filas. Resultado: 9 filas, 4096 pagos, 33993700.00,
+--   igual que la suma directa. OK (puede variar un poco si los seeds se cargan antes de
+--   las 03:00: se descartan sesiones de volumen de ayer que chocan con las abiertas).
 -- ============================================================
 SELECT s.nombre  AS sede,
        tv.nombre AS tipo_vehiculo,
@@ -147,7 +151,7 @@ ORDER BY sesiones_30_dias DESC, c.nombre;
 --   Centro 19 activos, 4 ocupados, 15 libres, 21.1 %
 --   Norte  19 activos, 4 ocupados, 15 libres, 21.1 %
 --   Sur    20 activos, 2 ocupados, 18 libres, 10.0 % (no sale por el filtro)
---   -> se esperan 2 filas (Centro y Norte). Resultado: pendiente.
+--   -> se esperan 2 filas (Centro y Norte). Resultado: 2 filas, 21.1 % cada una. OK
 -- ============================================================
 SELECT sede, espacios_activos, en_mantenimiento, ocupados, libres, porcentaje_ocupacion
 FROM v_ocupacion_actual
@@ -165,7 +169,7 @@ ORDER BY porcentaje_ocupacion DESC, sede;
 -- Verificacion: hace 200 dias rigen las tarifas cerradas
 --   [hoy-730, hoy-120): Centro 4000 / 2000 / 5500, Norte 3500 / 1800 / 5000,
 --   Sur 3000 / 1500 / 4500 (carro / moto / camioneta)
---   -> se esperan 9 filas, ninguna NULL. Resultado: pendiente.
+--   -> se esperan 9 filas, ninguna NULL. Resultado: 9 filas con esos valores. OK
 --   (Con CURRENT_DATE - 120 debe salir ya la tarifa nueva: 4500 en Centro carro.)
 -- ============================================================
 SELECT s.nombre  AS sede,
@@ -189,7 +193,7 @@ ORDER BY s.nombre, tv.nombre;
 -- Verificacion: fecha_fin = inicio + duracion. De las 14 suscripciones,
 --   10 estan activas; vencen en 7 dias o menos CDE34F (2), DEF456 (3),
 --   BCD234 (5) y FGH45J (6). LMN901 venceria en 4 pero esta cancelada.
---   -> se esperan 4 filas. Resultado: pendiente.
+--   -> se esperan 4 filas. Resultado: 4 filas, 2, 3, 5 y 6 dias. OK
 -- ============================================================
 WITH suscripcion_activa AS (
     SELECT id_suscripcion, id_cliente, placa, id_plan, fecha_fin
@@ -223,7 +227,7 @@ ORDER BY dias_restantes, c.nombre;
 -- cancelada por vehiculo y fecha, asi que no se duplican filas.
 -- Verificacion: 10 sesiones abiertas. Cubiertos: ABC123, DEF456, EFG567,
 --   FGH45J. Pagan: HJK789 (cancelada), KLN012, QRS345, RST456, STU67V, TMP0001.
---   -> se esperan 10 filas: 4 cubiertos y 6 que pagan. Resultado: pendiente.
+--   -> se esperan 10 filas: 4 cubiertos y 6 que pagan. Resultado: 10 filas, 4 y 6. OK
 -- ============================================================
 SELECT ses.placa,
        tv.nombre                     AS tipo_vehiculo,

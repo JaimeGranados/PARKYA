@@ -1,11 +1,12 @@
 # reconstruir.ps1
+# Sin tildes a proposito: Windows PowerShell 5.1 lee los .ps1 sin BOM como ANSI y las muestra mal.
 # Borra y crea la base de datos, ejecuta migraciones/*.sql en orden de nombre y
-# después seeds/*.sql. Se detiene en el primer error.
+# despues seeds/*.sql. Se detiene en el primer error.
 #
 # Credenciales: solo por variables de entorno de PostgreSQL (PGHOST, PGPORT, PGUSER,
-# PGPASSWORD). Este script nunca contiene una contraseña.
+# PGPASSWORD). Este script nunca contiene una contrasena.
 #
-# Uso (desde la raíz del repositorio):
+# Uso (desde la raiz del repositorio):
 #   ./scripts/reconstruir.ps1
 #   ./scripts/reconstruir.ps1 -BaseDatos parkya_prueba
 #   ./scripts/reconstruir.ps1 -SinSeeds
@@ -17,11 +18,11 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# Los .sql están en UTF-8 (tildes en comentarios y datos).
+# Los .sql estan en UTF-8 (tildes en comentarios y datos).
 $env:PGCLIENTENCODING = "UTF8"
 
 if (-not (Get-Command psql -ErrorAction SilentlyContinue)) {
-    Write-Error "No se encontró psql en el PATH. Agregue la carpeta bin de PostgreSQL al PATH."
+    Write-Error "No se encontro psql en el PATH. Agregue la carpeta bin de PostgreSQL al PATH."
 }
 
 $raiz = Split-Path -Parent $PSScriptRoot

@@ -99,7 +99,7 @@ JOIN tipo_vehiculo t ON t.nombre = v.tipo;
 
 
 -- ---------- Clientes (28) ----------
--- 80000001-80000012: suscriptores. 90000001-90000016: ocasionales.
+-- 80000001-80000012: suscriptores. 70000001-70000016: ocasionales (los 9000000x son de empleados).
 INSERT INTO cliente (nombre, documento, telefono, correo, tipo_cliente) VALUES
  ('Andrea Ospina',     '80000001', '3101000001', 'andrea.ospina@ejemplo.com',   'suscriptor'),
  ('Felipe Rendón',     '80000002', '3101000002', 'felipe.rendon@ejemplo.com',   'suscriptor'),
@@ -113,22 +113,22 @@ INSERT INTO cliente (nombre, documento, telefono, correo, tipo_cliente) VALUES
  ('Mateo Giraldo',     '80000010', '3101000010', 'mateo.giraldo@ejemplo.com',   'suscriptor'),
  ('Daniela Restrepo',  '80000011', '3101000011', 'daniela.restrepo@ejemplo.com','suscriptor'),
  ('Esteban Mejía',     '80000012', '3101000012', 'esteban.mejia@ejemplo.com',   'suscriptor'),
- ('Gloria Henao',      '90000001', '3202000001', 'gloria.henao@ejemplo.com',    'ocasional'),
- ('Camila Duque',      '90000002', '3202000002', 'camila.duque@ejemplo.com',    'ocasional'),
- ('Diego Montoya',     '90000003', '3202000003', 'diego.montoya@ejemplo.com',   'ocasional'),
- ('Valentina Ríos',    '90000004', '3202000004', 'valentina.rios@ejemplo.com',  'ocasional'),
- ('Santiago Peña',     '90000005', '3202000005', 'santiago.pena@ejemplo.com',   'ocasional'),
- ('Juliana Salazar',   '90000006', '3202000006', 'juliana.salazar@ejemplo.com', 'ocasional'),
- ('Andrés Cuartas',    '90000007', '3202000007', 'andres.cuartas@ejemplo.com',  'ocasional'),
- ('Manuela Botero',    '90000008', '3202000008', 'manuela.botero@ejemplo.com',  'ocasional'),
- ('Tomás Uribe',       '90000009', '3202000009', 'tomas.uribe@ejemplo.com',     'ocasional'),
- ('Isabela Gómez',     '90000010', '3202000010', 'isabela.gomez@ejemplo.com',   'ocasional'),
- ('Nicolás Franco',    '90000011', '3202000011', 'nicolas.franco@ejemplo.com',  'ocasional'),
- ('Sara Jaramillo',    '90000012', '3202000012', 'sara.jaramillo@ejemplo.com',  'ocasional'),
- ('Camilo Osorio',     '90000013', '3202000013', 'camilo.osorio@ejemplo.com',   'ocasional'),
- ('Luisa Marín',       '90000014', '3202000014', 'luisa.marin@ejemplo.com',     'ocasional'),
- ('Daniel Acevedo',    '90000015', '3202000015', 'daniel.acevedo@ejemplo.com',  'ocasional'),
- ('Karen Bedoya',      '90000016', NULL,         NULL,                          'ocasional');
+ ('Gloria Henao',      '70000001', '3202000001', 'gloria.henao@ejemplo.com',    'ocasional'),
+ ('Camila Duque',      '70000002', '3202000002', 'camila.duque@ejemplo.com',    'ocasional'),
+ ('Diego Montoya',     '70000003', '3202000003', 'diego.montoya@ejemplo.com',   'ocasional'),
+ ('Valentina Ríos',    '70000004', '3202000004', 'valentina.rios@ejemplo.com',  'ocasional'),
+ ('Santiago Peña',     '70000005', '3202000005', 'santiago.pena@ejemplo.com',   'ocasional'),
+ ('Juliana Salazar',   '70000006', '3202000006', 'juliana.salazar@ejemplo.com', 'ocasional'),
+ ('Andrés Cuartas',    '70000007', '3202000007', 'andres.cuartas@ejemplo.com',  'ocasional'),
+ ('Manuela Botero',    '70000008', '3202000008', 'manuela.botero@ejemplo.com',  'ocasional'),
+ ('Tomás Uribe',       '70000009', '3202000009', 'tomas.uribe@ejemplo.com',     'ocasional'),
+ ('Isabela Gómez',     '70000010', '3202000010', 'isabela.gomez@ejemplo.com',   'ocasional'),
+ ('Nicolás Franco',    '70000011', '3202000011', 'nicolas.franco@ejemplo.com',  'ocasional'),
+ ('Sara Jaramillo',    '70000012', '3202000012', 'sara.jaramillo@ejemplo.com',  'ocasional'),
+ ('Camilo Osorio',     '70000013', '3202000013', 'camilo.osorio@ejemplo.com',   'ocasional'),
+ ('Luisa Marín',       '70000014', '3202000014', 'luisa.marin@ejemplo.com',     'ocasional'),
+ ('Daniel Acevedo',    '70000015', '3202000015', 'daniel.acevedo@ejemplo.com',  'ocasional'),
+ ('Karen Bedoya',      '70000016', NULL,         NULL,                          'ocasional');
 
 INSERT INTO cliente_suscriptor (id_cliente, fecha_afiliacion)
 SELECT id_cliente, CURRENT_DATE - 120
@@ -199,34 +199,34 @@ JOIN plan_suscripcion p ON p.id_tipo_vehiculo = t.id_tipo_vehiculo AND p.nombre 
 INSERT INTO vehiculo (placa, id_tipo_vehiculo, id_cliente)
 SELECT v.placa, t.id_tipo_vehiculo, c.id_cliente
 FROM (VALUES
- ('QRS345','carro',     '90000001'),
- ('GHK78L','moto',      '90000001'),
- ('RST456','carro',     '90000002'),
- ('HJL890','camioneta', '90000002'),
- ('STU67V','moto',      '90000003'),
- ('JKM901','carro',     '90000003'),
- ('TUV567','carro',     '90000004'),
- ('KLN012','carro',     '90000004'),
- ('UVW678','camioneta', '90000005'),
- ('LMP123','carro',     '90000005'),
- ('VWX789','carro',     '90000006'),
- ('WXY89Z','moto',      '90000007'),
- ('XYZ890','carro',     '90000008'),
- ('YZA901','carro',     '90000009'),
- ('ZAB12C','moto',      '90000010'),
- ('ABD012','carro',     '90000011'),
- ('BCE123','camioneta', '90000012'),
- ('CDF234','carro',     '90000013'),
- ('DEG45H','moto',      '90000014'),
- ('EFH567','carro',     '90000015'),
- ('FGJ678','carro',     '90000016'),
+ ('QRS345','carro',     '70000001'),
+ ('GHK78L','moto',      '70000001'),
+ ('RST456','carro',     '70000002'),
+ ('HJL890','camioneta', '70000002'),
+ ('STU67V','moto',      '70000003'),
+ ('JKM901','carro',     '70000003'),
+ ('TUV567','carro',     '70000004'),
+ ('KLN012','carro',     '70000004'),
+ ('UVW678','camioneta', '70000005'),
+ ('LMP123','carro',     '70000005'),
+ ('VWX789','carro',     '70000006'),
+ ('WXY89Z','moto',      '70000007'),
+ ('XYZ890','carro',     '70000008'),
+ ('YZA901','carro',     '70000009'),
+ ('ZAB12C','moto',      '70000010'),
+ ('ABD012','carro',     '70000011'),
+ ('BCE123','camioneta', '70000012'),
+ ('CDF234','carro',     '70000013'),
+ ('DEG45H','moto',      '70000014'),
+ ('EFH567','carro',     '70000015'),
+ ('FGJ678','carro',     '70000016'),
  ('TMP0001','carro',    NULL),
  ('TMP0002','moto',     NULL)
 ) AS v(placa, tipo, doc)
 JOIN tipo_vehiculo t ON t.nombre = v.tipo
 LEFT JOIN cliente c ON c.documento = v.doc;
 
--- ---------- Sesiones cerradas (71) ----------
+-- ---------- Sesiones cerradas (73) ----------
 -- Columnas: placa, sede, espacio, documento del empleado que cierra (NULL = cierre
 -- automatico), dias atras, hora de entrada, duracion en horas, cubierta por suscripcion.
 -- valor_cobrado = 0 si esta cubierta; si no, horas * tarifa vigente de la sede y tipo.
@@ -381,7 +381,9 @@ JOIN plan_suscripcion p ON p.id_plan = su.id_plan;
 -- Reportan 6 de los 9 empleados. Nunca reportan: Sofia Quintero (90000003),
 -- Hernan Beltran (90000006) y Patricia Leal (90000009) -> consulta 3 devuelve 3 filas.
 -- Una incidencia no ligada a ninguna sesion (placa NULL -> id_sesion NULL).
--- La sesion se ubica por placa y dias atras de su entrada.
+-- La sesion se ubica por placa y dias atras de su entrada. Solo sesiones cerradas:
+-- si se carga antes de las 02:00, la sesion abierta de HJK789 cae en el dia anterior
+-- y la incidencia saldria duplicada.
 INSERT INTO incidencia (id_sesion, id_empleado, tipo_incidencia, descripcion, fecha)
 SELECT s.id_sesion, e.id_empleado, v.tipo, v.descr,
        COALESCE(s.hora_entrada + interval '1 hour', now() - interval '2 days')
@@ -400,4 +402,5 @@ FROM (VALUES
 ) AS v(doc, placa, dias, tipo, descr)
 JOIN empleado e ON e.documento = v.doc
 LEFT JOIN sesion s ON s.placa = v.placa
+                  AND s.hora_salida IS NOT NULL
                   AND s.hora_entrada::date = CURRENT_DATE - v.dias;
