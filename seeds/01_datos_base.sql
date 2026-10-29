@@ -255,3 +255,55 @@ FROM (VALUES
  ('STU67V','Sur',   'C-04', 1)
 ) AS v(placa, sede, espacio, horas)
 JOIN sede s ON s.nombre = 'ParkYa ' || v.sede;
+
+
+-- ---------- Pagos de sesiones ----------
+-- Un pago por cada sesion con valor_cobrado > 0 (las cubiertas por suscripcion cobran 0
+-- y no tienen pago: monto debe ser > 0). La sesion de BCE123 se paga en dos pagos.
+INSERT INTO pago (id_sesion, monto, metodo_pago, fecha_pago)
+SELECT s.id_sesion, s.valor_cobrado,
+       (ARRAY['efectivo','tarjeta','app'])[1 + s.id_sesion % 3],
+       s.hora_salida
+FROM sesion s
+WHERE s.valor_cobrado > 0
+  AND s.placa <> 'BCE123';
+
+-- Sesion pagada en dos pagos (valor cobrado 19600 = 10000 + 9600)
+INSERT INTO pago (id_sesion, monto, metodo_pago, fecha_pago)
+SELECT s.id_sesion, v.monto, v.metodo, s.hora_salida
+FROM sesion s
+CROSS JOIN (VALUES (10000, 'efectivo'), (9600, 'tarjeta')) AS v(monto, metodo)
+WHERE s.placa = 'BCE123';
+
+-- ---------- Pagos de suscripciones (uno por suscripcion, el dia de inicio) ----------
+INSERT INTO pago (id_suscripcion, monto, metodo_pago, fecha_pago)
+SELECT su.id_suscripcion, p.precio,
+       (ARRAY['efectivo','tarjeta','app'])[1 + su.id_suscripcion % 3],
+       su.fecha_inicio + interval '9 hours'
+FROM suscripcion su
+JOIN plan_suscripcion p ON p.id_plan = su.id_plan;
+
+-- ---------- Incidencias (11) ----------
+-- Reportan 6 de los 9 empleados. Nunca reportan: Sofia Quintero (90000003),
+-- Hernan Beltran (90000006) y Patricia Leal (90000009) -> consulta 3 devuelve 3 filas.
+-- Una incidencia no ligada a ninguna sesion (placa NULL -> id_sesion NULL).
+-- La sesion se ubica por placa y dias atras de su entrada.
+INSERT INTO incidencia (id_sesion, id_empleado, tipo_incidencia, descripcion, fecha)
+SELECT s.id_sesion, e.id_empleado, v.tipo, v.descr,
+       COALESCE(s.hora_entrada + interval '1 hour', now() - interval '2 days')
+FROM (VALUES
+ ('90000001','QRS345', 8, 'mal_parqueo','Vehiculo ocupando dos espacios'),
+ ('90000002','GHK78L',11, 'dano',       'Rayon en el costado izquierdo'),
+ ('90000001','LMN901', 1, 'fraude',     'Intento de usar una suscripcion cancelada'),
+ ('90000004','RST456',13, 'mal_parqueo','Vehiculo sobre la linea de demarcacion'),
+ ('90000005','HJK789', 1, 'fraude',     'Intento de usar una suscripcion cancelada'),
+ ('90000004','KLN012',15, 'dano',       'Espejo roto al ingresar'),
+ ('90000007','GHJ678',10, 'otro',       'Cliente reclama cobro por suscripcion vencida'),
+ ('90000008','EFG567',10, 'otro',       'Tarjeta de acceso extraviada'),
+ ('90000007','STU67V',22, 'mal_parqueo','Moto estacionada fuera del carril'),
+ ('90000008','CDE34F',15, 'dano',       'Moto caida por el viento'),
+ ('90000005',NULL,  NULL, 'otro',       'Luz del piso 2 danada')
+) AS v(doc, placa, dias, tipo, descr)
+JOIN empleado e ON e.documento = v.doc
+LEFT JOIN sesion s ON s.placa = v.placa
+                  AND s.hora_entrada::date = CURRENT_DATE - v.dias;
