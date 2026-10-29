@@ -130,3 +130,128 @@ FROM (VALUES
 JOIN cliente c ON c.documento = v.documento
 JOIN tipo_vehiculo t ON t.nombre = v.tipo
 JOIN plan_suscripcion p ON p.id_tipo_vehiculo = t.id_tipo_vehiculo AND p.nombre = v.plan;
+
+
+-- ---------- Sesiones cerradas (71) ----------
+-- Columnas: placa, sede, espacio, documento del empleado que cierra (NULL = cierre
+-- automatico), dias atras, hora de entrada, duracion en horas, cubierta por suscripcion.
+-- valor_cobrado = 0 si esta cubierta; si no, horas * tarifa vigente de la sede y tipo.
+-- Casos a proposito:
+--   * Suscriptores con sesiones cubiertas dentro de su suscripcion (valor 0)
+--   * Suscripciones vencidas o canceladas (GHJ678, HJK789, LMN901, PQR23S): sesiones
+--     despues de perder la cobertura, pagadas normal (consulta 4)
+--   * Ocasionales con muchas sesiones en los ultimos 30 dias: Gloria (QRS345 y GHK78L,
+--     6 sesiones), Camila (RST456 y HJL890, 5), Diego (3)
+--   * Sesiones cerradas por empleado y otras con cierre automatico (NULL)
+INSERT INTO sesion (placa, id_sede, numero_espacio, id_empleado_cierre,
+                    hora_entrada, hora_salida, valor_cobrado)
+SELECT v.placa, s.id_sede, v.espacio, e.id_empleado,
+       (CURRENT_DATE - v.dias) + v.hora * interval '1 hour',
+       (CURRENT_DATE - v.dias) + (v.hora + v.dur) * interval '1 hour',
+       CASE WHEN v.cub THEN 0 ELSE v.dur * t.valor_hora END
+FROM (VALUES
+ -- suscriptores con cobertura
+ ('ABC123','Centro','A-03','90000001', 8, 8, 9, true),
+ ('ABC123','Centro','A-03','90000001', 6, 8, 9, true),
+ ('ABC123','Centro','A-04',NULL,       3, 8, 8, true),
+ ('ABC123','Centro','A-03','90000002', 1, 8, 9, true),
+ ('ABC123','Centro','A-05','90000001',14, 9, 3, false),
+ ('BCD234','Norte','A-03','90000004', 20, 7,10, true),
+ ('BCD234','Norte','A-03','90000005', 12, 7,10, true),
+ ('BCD234','Norte','A-04','90000004',  5, 7,10, true),
+ ('BCD234','Norte','A-03',NULL,        2, 7,10, true),
+ ('CDE34F','Sur','C-01','90000007',   30, 8, 9, true),
+ ('CDE34F','Sur','C-01','90000008',   15, 8, 9, true),
+ ('CDE34F','Sur','C-02','90000007',    4, 8, 9, true),
+ ('DEF456','Centro','B-06','90000002',18, 9, 8, true),
+ ('DEF456','Centro','B-06','90000001', 9, 9, 8, true),
+ ('DEF456','Centro','B-07',NULL,       2, 9, 8, true),
+ ('EFG567','Sur','A-03','90000008',   35, 8, 9, true),
+ ('EFG567','Sur','A-03','90000009',   10, 8, 9, true),
+ ('EFG567','Sur','A-04','90000007',    3, 8, 9, true),
+ ('FGH45J','Norte','C-01','90000005', 16, 8, 9, true),
+ ('FGH45J','Norte','C-02','90000004',  7, 8, 9, true),
+ ('JKL56M','Centro','C-01','90000001', 4, 8, 9, true),
+ ('JKL56M','Centro','C-01','90000002', 2, 8, 9, true),
+ ('KLM890','Norte','B-06','90000006', 40, 9, 8, true),
+ ('KLM890','Norte','B-06','90000005', 20, 9, 8, true),
+ ('KLM890','Norte','B-07','90000004',  6, 9, 8, true),
+ ('MNP012','Sur','A-05','90000007',    2, 8, 9, true),
+ ('NPQ12R','Sur','C-02','90000008',   12, 8, 9, true),
+ ('NPQ12R','Sur','C-03',NULL,          5, 8, 9, true),
+ -- suscripciones vencidas o canceladas
+ ('GHJ678','Sur','A-06','90000007',   25,10, 4, true),
+ ('GHJ678','Sur','A-06','90000008',   20,10, 4, true),
+ ('GHJ678','Sur','A-07','90000007',   10,10, 4, false),
+ ('GHJ678','Sur','A-06',NULL,          6,10, 3, false),
+ ('GHJ678','Sur','A-06','90000009',    2,10, 5, false),
+ ('HJK789','Norte','A-05','90000005', 18, 9, 8, true),
+ ('HJK789','Norte','A-05','90000004', 12, 9, 8, true),
+ ('HJK789','Norte','A-05','90000005',  3, 9, 4, false),
+ ('HJK789','Norte','A-06','90000006',  1, 9, 3, false),
+ ('LMN901','Centro','B-01','90000002',20, 8, 9, true),
+ ('LMN901','Centro','B-01',NULL,       9, 8, 9, true),
+ ('LMN901','Centro','B-02','90000001', 1, 8, 5, false),
+ ('PQR23S','Sur','C-03','90000008',   85, 9, 6, true),
+ ('PQR23S','Sur','C-03','90000007',   10, 9, 3, false),
+ -- ocasionales frecuentes
+ ('QRS345','Centro','A-07','90000001',27,18, 2, false),
+ ('QRS345','Centro','A-07','90000002',21,18, 3, false),
+ ('QRS345','Centro','A-07',NULL,      14,18, 2, false),
+ ('QRS345','Centro','A-07','90000001', 8,18, 4, false),
+ ('QRS345','Centro','A-07','90000001', 3,18, 2, false),
+ ('GHK78L','Centro','C-02','90000002',11,12, 2, false),
+ ('RST456','Norte','A-07','90000004', 26,19, 2, false),
+ ('RST456','Norte','A-07','90000005', 19,19, 3, false),
+ ('RST456','Norte','A-07','90000004', 13,19, 2, false),
+ ('RST456','Norte','A-07',NULL,        7,19, 2, false),
+ ('HJL890','Norte','B-07','90000006',  4,10, 5, false),
+ ('STU67V','Sur','C-04','90000008',   22,13, 2, false),
+ ('JKM901','Sur','A-08','90000007',    9,13, 3, false),
+ ('STU67V','Sur','C-04','90000009',    3,13, 2, false),
+ -- visitas sueltas (ocasionales, visitantes y temporales)
+ ('TUV567','Centro','A-08','90000001',16,15, 2, false),
+ ('UVW678','Centro','B-07','90000002',24,11, 4, false),
+ ('VWX789','Norte','A-08','90000005',  5,16, 3, false),
+ ('WXY89Z','Norte','C-03','90000004',  8,14, 2, false),
+ ('XYZ890','Sur','B-01','90000007',   14,17, 2, false),
+ ('YZA901','Sur','B-02','90000008',    6,17, 3, false),
+ ('ZAB12C','Centro','C-03','90000001',17,10, 2, false),
+ ('ABD012','Norte','B-01','90000006', 23, 9, 5, false),
+ ('BCE123','Sur','B-06','90000009',   13,11, 4, false),
+ ('CDF234','Centro','B-03','90000002',29,12, 3, false),
+ ('DEG45H','Norte','C-02','90000005',  9,15, 2, false),
+ ('EFH567','Centro','B-04','90000001', 7,14, 3, false),
+ ('FGJ678','Sur','B-03','90000008',    2,12, 2, false),
+ ('TMP0001','Centro','B-05','90000001',11,13, 2, false),
+ ('TMP0002','Sur','C-02','90000007',   8,13, 2, false),
+ ('KLN012','Norte','B-02','90000004', 15,18, 3, false),
+ ('LMP123','Centro','B-02','90000002',45, 8, 3, false)
+) AS v(placa, sede, espacio, doc_cierre, dias, hora, dur, cub)
+JOIN sede s ON s.nombre = 'ParkYa ' || v.sede
+JOIN vehiculo ve ON ve.placa = v.placa
+JOIN tarifa t ON t.id_sede = s.id_sede
+             AND t.id_tipo_vehiculo = ve.id_tipo_vehiculo
+             AND t.vigencia_hasta IS NULL
+LEFT JOIN empleado e ON e.documento = v.doc_cierre;
+
+-- ---------- Sesiones abiertas ahora mismo (10) ----------
+-- hora_salida y valor_cobrado quedan NULL.
+-- Con suscripcion activa (4): ABC123, EFG567, DEF456, FGH45J
+-- Sin suscripcion activa (6): QRS345, HJK789 (cancelada), TMP0001, KLN012, RST456, STU67V
+-- Consulta 8: 4 cubiertos y 6 que pagaran al salir.
+INSERT INTO sesion (placa, id_sede, numero_espacio, hora_entrada)
+SELECT v.placa, s.id_sede, v.espacio, now() - v.horas * interval '1 hour'
+FROM (VALUES
+ ('ABC123','Centro','A-04', 2),
+ ('EFG567','Sur',   'A-03', 3),
+ ('DEF456','Centro','B-06', 1),
+ ('FGH45J','Norte', 'C-01', 3),
+ ('QRS345','Centro','A-07', 1),
+ ('HJK789','Norte', 'A-05', 2),
+ ('TMP0001','Centro','B-05', 3),
+ ('KLN012','Norte', 'B-02', 1),
+ ('RST456','Norte', 'A-07', 2),
+ ('STU67V','Sur',   'C-04', 1)
+) AS v(placa, sede, espacio, horas)
+JOIN sede s ON s.nombre = 'ParkYa ' || v.sede;
