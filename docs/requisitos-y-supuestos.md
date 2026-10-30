@@ -16,7 +16,7 @@
 
 - ¿Qué pasa si la cámara no logra leer la placa? **Supuesto:** se crea un registro de VEHICULO temporal y el empleado la corrige antes de que el vehículo salga.
 - ¿Un cliente ocasional puede convertirse en suscriptor? **Supuesto:** sí. Por eso CLIENTE se modeló como generalización con dos subtipos (CLIENTE_OCASIONAL y CLIENTE_SUSCRIPTOR).
-- ¿Puede un vehículo tener dos suscripciones activas al mismo tiempo? **Supuesto:** no debería; se hará cumplir con un disparador en la Entrega 2.
+- ¿Puede un vehículo tener dos suscripciones activas al mismo tiempo? **Supuesto:** no. En la Entrega 2 lo hace cumplir la restricción `ex_suscripcion_sin_solape` (`EXCLUDE`), en lugar del disparador previsto en la Entrega 1 (corrección C9).
 - ¿La tarifa depende de la hora del día? **Supuesto:** por ahora no, solo depende de sede y tipo de vehículo.
 - ¿Puede reportarse una incidencia sin una sesión activa? **Supuesto:** sí, por eso la relación SESION–INCIDENCIA es opcional.
 - ¿Qué pasa si se elimina un cliente? **Supuesto:** sus vehículos y sesiones no se eliminan; solo se desvincula el vehículo del cliente.
