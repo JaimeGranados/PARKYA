@@ -1,12 +1,12 @@
 # Correcciones de la Entrega 1
 
-> Estado: **propuesta** — pendiente de revisión del grupo. Cuando lleguen las observaciones del profesor, se agregan en la sección "Observaciones recibidas".
+> Estado: **implementado** en las migraciones de la Entrega 2.
 
 Este documento resume qué cambió en el diseño entre la Entrega 1 y la Entrega 2, y por qué. El esquema resultante está en [`esquema-relacional.md`](esquema-relacional.md).
 
 ## Observaciones recibidas
 
-_(Pendiente: copiar aquí las observaciones del profesor sobre la Entrega 1 y enlazar cada una con el cambio que la resuelve.)_
+El profesor no envió observaciones escritas sobre la Entrega 1. Los cambios de este documento salen de la revisión que hizo el grupo antes de implementar.
 
 ## Cambios de diseño
 
@@ -92,4 +92,4 @@ Se documentan aquí y se justifican en la auditoría de normalización:
 ## Pendiente
 
 - [x] Actualizar el diagrama EER con C1–C6: `diagramas/eer-chen-parkya-entrega2.png` (los cambios están en naranja).
-- [ ] Agregar las observaciones del profesor cuando lleguen.
+- [x] Observaciones del profesor: no hubo observaciones escritas (ver arriba).

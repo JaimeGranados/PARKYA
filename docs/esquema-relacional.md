@@ -1,6 +1,6 @@
 # Esquema relacional — Entrega 2
 
-> Estado: **propuesta** — pendiente de revisión del grupo. Es la base para escribir las migraciones. Los cambios frente a la Entrega 1 están explicados en [`correcciones-entrega-1.md`](correcciones-entrega-1.md) (C1–C11).
+> Estado: **implementado** en `migraciones/001`–`006`. Los cambios frente a la Entrega 1 están explicados en [`correcciones-entrega-1.md`](correcciones-entrega-1.md) (C1–C11).
 
 Convenciones:
 
